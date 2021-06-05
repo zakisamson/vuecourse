@@ -1,19 +1,45 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <search-bar @termChange="onTermChange" />
+    <video-list :videos="videos_state"></video-list>
+    {{ videos.length }}
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from "axios";
+import SearchBar from "./components/SearchBar.vue";
+import VideoList from "./components/VideoList.vue";
+const API_KEY = "AIzaSyCc6Qxhwcp6tacnWImV2tq72VJugz-mgx4";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    SearchBar,
+    VideoList,
+  },
+  methods: {
+    onTermChange(searchTerm) {
+      axios
+        .get("https://www.googleapis.com/youtube/v3/search", {
+          params: {
+            key: API_KEY,
+            type: "video",
+            part: "snippet",
+            q: searchTerm,
+          },
+        })
+        .then((response) => {
+          this.videos_state = response.data.items;
+        });
+    },
+  },
+  data() {
+    return {
+      videos_state: [],
+    };
+  },
+};
 </script>
 
 <style>
